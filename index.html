@@ -406,6 +406,50 @@
             border-color: var(--gray-800) transparent transparent transparent;
             pointer-events: none;
         }
+
+        @keyframes crunchMode {
+        0% { transform: scale(1); }
+        25% { transform: scale(1.1); background-color: #60a5fa; }
+        75% { transform: scale(1.1); background-color: #60a5fa; }
+        100% { transform: scale(1); }
+        }
+
+        .crunch-mode {
+            animation: crunchMode 1s ease;
+        }
+
+        .crunch-toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--gray-800);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: var(--radius);
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            text-align: center;
+        }
+
+        .crunch-toast.show {
+            opacity: 1;
+        }
+
+        .rainbow-text {
+            animation: rainbow 2s linear infinite;
+        }
+
+        @keyframes rainbow {
+            0% { color: #ff0000; }
+            20% { color: #ffa500; }
+            40% { color: #ffff00; }
+            60% { color: #008000; }
+            80% { color: #0000ff; }
+            100% { color: #ff0000; }
+        }
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -697,6 +741,59 @@
             }
             calculateCapacity();
         };
+
+        let konamiCode = [];
+    const correctCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    
+    document.addEventListener('keydown', (e) => {
+        konamiCode.push(e.key);
+        if (konamiCode.length > correctCode.length) {
+            konamiCode.shift();
+        }
+        
+        if (konamiCode.join(',') === correctCode.join(',')) {
+            activateCrunchMode();
+        }
+    });
+
+    function activateCrunchMode() {
+        // Create toast message
+        const toast = document.createElement('div');
+        toast.className = 'crunch-toast';
+        toast.innerHTML = '🚀 CRUNCH MODE ACTIVATED! 🚀<br><span class="rainbow-text">Maximum Velocity Achieved!</span>';
+        document.body.appendChild(toast);
+        
+        // Show toast
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // Animate all day cells
+        document.querySelectorAll('.day-cell').forEach(cell => {
+            cell.classList.add('crunch-mode');
+            const originalClass = cell.className;
+            const originalValue = cell.dataset.value;
+            const originalText = cell.textContent;
+            
+            cell.className = 'day-cell full-day crunch-mode';
+            cell.dataset.value = '1.0';
+            cell.textContent = '1.0';
+            
+            setTimeout(() => {
+                cell.classList.remove('crunch-mode');
+                cell.className = originalClass;
+                cell.dataset.value = originalValue;
+                cell.textContent = originalText;
+            }, 1000);
+        });
+        
+        // Remove toast after animation
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+        
+        // Reset code sequence
+        konamiCode = [];
+    }
     </script>
 </body>
 </html>
